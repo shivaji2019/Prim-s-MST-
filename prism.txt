@@ -1,0 +1,99 @@
+import java.util.*;
+
+public class Solution {
+
+    public static void main(String[] args) {
+        Scanner in = new Scanner(System.in);
+        int n = in.nextInt();
+        int m = in.nextInt();
+        Vertex[] ver = new Vertex[n];
+        for (int i = 0; i < m; i++) {
+            int x = in.nextInt();
+            int y = in.nextInt();
+            int r = in.nextInt();
+            Vertex nx = getVertex(x, ver);
+            Vertex ny = getVertex(y, ver);
+            nx.addEdge(ny, r);
+            ny.addEdge(nx, r);
+        }
+        int s = in.nextInt();
+        Vertex source = getVertex(s, ver);
+        solve(source);
+    }
+
+
+    private static Vertex getVertex(int n, Vertex[] ver) {
+        Vertex v = ver[n-1];
+        if(v == null){
+            v = new Vertex(n);
+            ver[n-1] = v;
+        }
+        return v;
+    }
+
+
+    private static void solve(Vertex source){
+        Set<Vertex> done = new HashSet<>();
+        PriorityQueue<Edge> found = new PriorityQueue<>();
+
+        done.add(source);
+        found.addAll(source.edges);
+
+        double total = 0;
+
+        while(!found.isEmpty()){
+            Edge e = found.poll();
+            Vertex v = e.target;
+            if(!done.contains(v)){
+                total+=e.weight;
+                done.add(v);
+                found.addAll(v.edges);
+            }
+        }
+
+        System.out.println((long)total);
+    }
+}
+
+
+
+class Vertex{
+    final int id;
+    final List<Edge> edges;
+
+    Vertex(int id){
+        this.id = id;
+        edges = new LinkedList<>();
+    }
+
+    public void addEdge(Vertex v, int w) {
+        edges.add(new Edge(v, w));
+    }
+
+    public String toString() {
+        return String.valueOf(id);
+    }
+
+    public boolean equals(Object o) {
+        return id == ((Vertex) o).id;
+    }
+
+    public int hashCode() {
+        return id;
+    }
+}
+
+
+class Edge implements Comparable<Edge>{
+    final Vertex target;
+    final double weight;
+
+    public Edge(Vertex target, int weight) {
+        this.target = target;
+        this.weight = weight;
+    }
+
+    public int compareTo(Edge other) {
+        return Double.compare(this.weight, other.weight);
+    }
+}
